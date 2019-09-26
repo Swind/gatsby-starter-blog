@@ -9,6 +9,7 @@ export default {
         enable: true,
         shortName: 'sorcererxwblog',
     },
+    notionFolderPath: `${__dirname}/content/notion`
 }
 
 function getTableViewId() {
