@@ -18,7 +18,8 @@ import console = require('console');
 const pageId = config.blogTablePageId
 const viewId = config.blogTableViewId
 
-const postListPath = `${config.notionFolderPath}/PostListPath.json`
+const postListPath = `${config.notionFolderPath}/PostList.json`
+const postFolderPath = `${config.notionFolderPath}/Posts`
 
 function writeFile(filePath: string, data: any) {
     return new Promise((resolve, reject) => {
@@ -32,20 +33,31 @@ function writeFile(filePath: string, data: any) {
     })
 }
 
-function readFile(filePath: string) {
+function readFile(filePath: string): Promise<string> {
     return new Promise((resolve, reject) => {
-        fs.readFile(filePath, 'utf-8', (err, data) => {
-            if (err) {
-                reject(err)
-            } else {
-                resolve(data)
-            }
-        })
+        if (!fs.existsSync(filePath)) {
+            resolve("[]")
+        } else {
+            fs.readFile(filePath, 'utf-8', (err, data) => {
+                if (err) {
+                    reject(err)
+                } else {
+                    resolve(data)
+                }
+            })
+        }
     })
 }
 
-async function getPostList(): Promise<ArticleMeta[]> {
-    return notionService.getArticleMetaList(pageId, viewId)
+async function getPostList(): Promise<Record<string, ArticleMeta>> {
+    const articleMetaList = await notionService.getArticleMetaList(pageId, viewId)
+
+    let result: Record<string, ArticleMeta> = {}
+    articleMetaList.forEach(meta => {
+        result[meta.id] = meta
+    });
+
+    return result
 }
 
 async function getPost(id: string): Promise<Article> {
@@ -57,8 +69,20 @@ async function updatePostList() {
     await writeFile(postListPath, JSON.stringify(postList))
 }
 
-async function loadPostList(folderPath: string) {
+async function updatePosts(postList: ArticleMeta[]) {
+    const latestPostList = await getPostList()
+    const currentPostList = loadPostList()
 
+    postList.forEach(async (meta) => {
+        const post = await getPost(meta.id)
+
+    })
+}
+
+async function loadPostList(): Promise<ArticleMeta[]> {
+    const data: string = await readFile(postListPath)
+    const postList: ArticleMeta[] = JSON.parse(data)
+    return postList
 }
 
 async function loadPosts() {
@@ -74,6 +98,7 @@ export default {
     getPost,
 }
 
+/*
 updatePostList()
     .then(() => {
         console.log("Done !")
@@ -81,18 +106,5 @@ updatePostList()
     .catch(err => {
         console.log(err)
     })
-
-/*
-getPostList()
-    .then(text => {
-        console.log(text);
-    })
-    .catch(err => {
-        // Deal with the fact the chain failed
-    });
-
-getPost("a6223314-431f-406a-8752-308f0e271e61")
-    .then(post => {
-        console.log(JSON.stringify(post))
-    }).catch(err => { })
 */
+loadPostList()
