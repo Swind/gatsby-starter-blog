@@ -2,7 +2,7 @@ export default {
     blogName: 'SorcererXW Blog',
     blogFavicon: '/static/favicon.png',
     siteManifest: '/static/manifest.json',
-    blogTablePageId: 'd6f20169e3b849059656e33a47e19003',
+    blogTablePageId: 'c0187f84fea34f68b58ddd1d93af30c5',
     blogTableViewId: getTableViewId(),
     googleAnalyticsId: 'UA-125409209-1',
     disqusConfig: {
@@ -15,7 +15,7 @@ export default {
 function getTableViewId() {
     const dev = process.env.NODE_ENV !== 'production'
     if (dev) {
-        return 'f5606624c1bf468ea87228889f9df9cb'
+        return '396c5a715c204c80b2b78b01eabcc218'
     }
-    return 'e38cce53950143c28d3449b99397cbca'
+    return '396c5a715c204c80b2b78b01eabcc218'
 }
