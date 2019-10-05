@@ -8,6 +8,8 @@ import { string } from 'prop-types';
 import path from 'path'
 
 import log from "loglevel"
+import { Actions, NodePluginArgs } from 'gatsby';
+
 
 const pageId = config.blogTablePageId
 const viewId = config.blogTableViewId
@@ -87,9 +89,9 @@ async function savePost(post: Article) {
     await writeFile(postFilePath, JSON.stringify(post))
 }
 
-async function updatePosts() {
-    const currentPostList = await loadPostList()
-    const latestPostList = await getPostList()
+async function _updatePosts(
+    currentPostList:Record<string, ArticleMeta>, 
+    latestPostList:Record<string, ArticleMeta>) {
 
     for (var postId in latestPostList) {
         if (postId in currentPostList) {
@@ -108,17 +110,29 @@ async function updatePosts() {
     }
 }
 
-async function loadPosts() {
+type CreateNode = Actions['createNode']
+type CreateNodeId = NodePluginArgs['createNodeId'] 
+type CreateContentDigest = NodePluginArgs['createContentDigest']
 
-}
+async function updatePosts(
+    createNode:CreateNode, 
+    createNodeId:CreateNodeId, 
+    createContentDigest: CreateContentDigest){
 
-async function loadPost() {
+    log.info(`Loading current PostList`)
+    const currentPostList = await loadPostList()
 
+    log.info(`Getting latest PostList`)
+    const latestPostList = await getPostList()
+
+    log.info(`Updating posts ...`)
+    _updatePosts(currentPostList, latestPostList)
+
+    log.info(`Saving latest post list ...`)
 }
 
 export default {
-    getPostList,
-    getPost,
+    updatePosts
 }
 
 updatePosts()

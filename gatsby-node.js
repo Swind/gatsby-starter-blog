@@ -1,7 +1,24 @@
+const PostService = require(`./src/notion/api/postService`)
 const path = require(`path`)
 const {
   createFilePath
 } = require(`gatsby-source-filesystem`)
+
+exports.sourceNodes = async({
+  actions,
+  createNodeId,
+  createContentDigest
+}) => {
+  const {
+    createNode
+  } = actions
+
+  await PostService.updatePosts({
+    createNode,
+    createNodeId,
+    createContentDigest
+  })
+}
 
 exports.createPages = async ({
   graphql,
@@ -66,16 +83,4 @@ exports.onCreateNode = ({
   const {
     createNodeField
   } = actions
-
-  if (node.internal.type === `MarkdownRemark`) {
-    const value = createFilePath({
-      node,
-      getNode
-    })
-    createNodeField({
-      name: `slug`,
-      node,
-      value,
-    })
-  }
 }
