@@ -200,11 +200,11 @@ async function SyncPosts(
                 type: `Post`,
                 mediaType: `text/html`,
                 content: JSON.stringify(post),
-                contentDigest: createContentDigest(post)
+                contentDigest: createContentDigest(post),
             },
         }
-
-        createNode(postNode) 
+        const data = Object.assign({}, post, postNode)
+        createNode(data) 
     })
 }
 
