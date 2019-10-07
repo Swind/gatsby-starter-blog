@@ -78,20 +78,38 @@ async function getPostList(): Promise<Record<string, ArticleMeta>> {
     return _convertPostListToDict(postList)
 }
 
+function getPostFilePath(postId: string): string {
+    return path.join(postFolderPath, postId + ".json")
+}
+
 async function getPost(id: string): Promise<Article> {
     return notionService.getArticle(id)
 }
 
 async function savePost(post: Article) {
-    const postFilePath = path.join(postFolderPath, post.meta.id + ".json")
+    const postFilePath = getPostFilePath(post.meta.id)
 
     log.info(`Save post ${post.meta.name} to ${postFilePath}`)
     await writeFile(postFilePath, JSON.stringify(post))
 }
 
+async function loadPost(postId: string): Promise<Article | undefined> {
+    const postFilePath = getPostFilePath(postId)
+    const data = await readFile(postFilePath)
+
+    if (data != undefined) {
+        return JSON.parse(data)
+    } else {
+        return undefined
+    }
+}
+
+type PostHandler = (article: Article, modified: boolean) => void
+
 async function _updatePosts(
-    currentPostList:Record<string, ArticleMeta>, 
-    latestPostList:Record<string, ArticleMeta>) {
+    currentPostList: Record<string, ArticleMeta>,
+    latestPostList: Record<string, ArticleMeta>,
+    postHandler: PostHandler) {
 
     for (var postId in latestPostList) {
         if (postId in currentPostList) {
@@ -99,46 +117,92 @@ async function _updatePosts(
             const latestPostMeta = latestPostList[postId]
 
             if (currentPostMeta.lastModifiedDate == latestPostMeta.lastModifiedDate) {
-                continue
+                const post = await loadPost(postId)
+                // If the post is not modified and the cache file is existing,
+                // load the post from file.
+                if (post != undefined) {
+                    postHandler(post, false)
+                    continue
+                } else {
+                    log.error(`Can't load post ${postId}, try to get the post from notion`)
+                }
             }
         }
 
         log.info(`Getting post ${postId}`)
         const newPost = await getPost(postId)
+
         log.info(`Updating post ${newPost.meta.name} - ${postId}`)
-        await savePost(newPost)
+        postHandler(newPost, true)
     }
 }
 
 type CreateNode = Actions['createNode']
-type CreateNodeId = NodePluginArgs['createNodeId'] 
+type CreateNodeId = NodePluginArgs['createNodeId']
 type CreateContentDigest = NodePluginArgs['createContentDigest']
 
-async function updatePosts(
-    createNode:CreateNode, 
-    createNodeId:CreateNodeId, 
-    createContentDigest: CreateContentDigest){
-
+async function UpdateAndLoadPostFiles(): Promise<Article[]> {
     log.info(`Loading current PostList`)
     const currentPostList = await loadPostList()
 
     log.info(`Getting latest PostList`)
     const latestPostList = await getPostList()
 
-    log.info(`Updating posts ...`)
-    _updatePosts(currentPostList, latestPostList)
+    const result: Article[] = []
+
+    const savePostFileHandler = (post: Article, modified: boolean) => {
+        if (modified) {
+            savePost(post)
+        }
+
+        result.push(post)
+    }
+
+    log.info(`Updating posts`)
+    await _updatePosts(currentPostList, latestPostList, savePostFileHandler)
+
+    return result
+}
+
+function UpdatePostFiles() {
+    UpdateAndLoadPostFiles()
+        .then(() => {
+            log.info("Done !")
+        })
+        .catch((e) => {
+            log.error(e)
+        })
+}
+
+
+async function SyncPosts(
+    createNode: CreateNode,
+    createNodeId: CreateNodeId,
+    createContentDigest: CreateContentDigest) {
 
     log.info(`Saving latest post list ...`)
+    const posts = await UpdateAndLoadPostFiles()
+
+    log.info(`Convert post to sourceNode`)
+    posts.forEach((post: Article, index: number) => {
+        const postNode = {
+            id: createNodeId(post.meta.id),
+            parent: `__SOURCE__`,
+            children: [],
+            internal: {
+                type: `Post`,
+                mediaType: `text/html`,
+                content: JSON.stringify(post),
+                contentDigest: createContentDigest(post)
+            },
+        }
+
+        createNode(postNode) 
+    })
 }
 
 export default {
-    updatePosts
+    SyncPosts
 }
 
-updatePosts()
-    .then(() => {
-        console.log("Done !")
-    })
-    .catch(err => {
-        console.log(err)
-    })
+//UpdatePostFiles()
