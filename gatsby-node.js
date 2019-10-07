@@ -1,3 +1,10 @@
+require('ts-node').register({
+  compilerOptions: {
+    module: 'commonjs',
+    target: 'es2017',
+  },
+})
+
 const PostService = require(`./src/notion/api/postService`)
 const path = require(`path`)
 const {
@@ -13,11 +20,11 @@ exports.sourceNodes = async({
     createNode
   } = actions
 
-  await PostService.updatePosts({
+  await PostService.default.SyncPosts(
     createNode,
     createNodeId,
     createContentDigest
-  })
+  )
 }
 
 exports.createPages = async ({

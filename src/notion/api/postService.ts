@@ -68,8 +68,8 @@ async function loadPostList(): Promise<Record<string, ArticleMeta>> {
         return {}
     }
 
-    const postList: ArticleMeta[] = JSON.parse(data)
-    return _convertPostListToDict(postList)
+    const postList: Record<string, ArticleMeta> = JSON.parse(data)
+    return postList
 }
 
 
@@ -116,6 +116,7 @@ async function _updatePosts(
             const currentPostMeta = currentPostList[postId]
             const latestPostMeta = latestPostList[postId]
 
+            log.info(`${currentPostMeta.lastModifiedDate} : ${latestPostMeta.lastModifiedDate}`)
             if (currentPostMeta.lastModifiedDate == latestPostMeta.lastModifiedDate) {
                 const post = await loadPost(postId)
                 // If the post is not modified and the cache file is existing,
@@ -161,6 +162,8 @@ async function UpdateAndLoadPostFiles(): Promise<Article[]> {
     log.info(`Updating posts`)
     await _updatePosts(currentPostList, latestPostList, savePostFileHandler)
 
+    await savePostList(latestPostList)
+
     return result
 }
 
@@ -179,6 +182,10 @@ async function SyncPosts(
     createNode: CreateNode,
     createNodeId: CreateNodeId,
     createContentDigest: CreateContentDigest) {
+
+    console.log(createNode)
+    console.log(createNodeId)
+    console.log(createContentDigest)
 
     log.info(`Saving latest post list ...`)
     const posts = await UpdateAndLoadPostFiles()
@@ -202,7 +209,7 @@ async function SyncPosts(
 }
 
 export default {
-    SyncPosts
+    "SyncPosts": SyncPosts
 }
 
 //UpdatePostFiles()
