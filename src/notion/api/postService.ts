@@ -203,7 +203,7 @@ async function SyncPosts(
                 contentDigest: createContentDigest(post),
             },
         }
-        const data = Object.assign({}, post, postNode)
+        const data = Object.assign({}, post.meta, postNode)
         createNode(data) 
     })
 }

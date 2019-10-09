@@ -8,7 +8,7 @@ import { rhythm } from "../utils/typography"
 
 interface Props {
   data: {
-    allMarkdownRemark: any
+    allPost: any
     site: {
       siteMetadata: {
         title: string
@@ -19,29 +19,29 @@ interface Props {
 
 const BlogIndex = ({ data }: Props) => {
   const siteTitle = data.site.siteMetadata.title
-  const posts = data.allMarkdownRemark.edges
+  const posts = data.allPost.edges
 
   return (
     <Layout location={window.location} title={siteTitle}>
       <SEO title="All posts" />
       <Bio />
       {posts.map(({ node }) => {
-        const title = node.frontmatter.title || node.fields.slug
+        const title = node.title || node.name
         return (
-          <div key={node.fields.slug}>
+          <div key={node.name}>
             <h3
               style={{
                 marginBottom: rhythm(1 / 4),
               }}
             >
-              <Link style={{ boxShadow: `none` }} to={node.fields.slug}>
+              <Link style={{ boxShadow: `none` }} to={node.name}>
                 {title}
               </Link>
             </h3>
-            <small>{node.frontmatter.date}</small>
+            <small>{node.date}</small>
             <p
               dangerouslySetInnerHTML={{
-                __html: node.frontmatter.description || node.excerpt,
+                __html: node.title,
               }}
             />
           </div>
@@ -60,18 +60,13 @@ export const pageQuery = graphql`
         title
       }
     }
-    allMarkdownRemark(sort: { fields: [frontmatter___date], order: DESC }) {
+    allPost {
       edges {
         node {
-          excerpt
-          fields {
-            slug
-          }
-          frontmatter {
-            date(formatString: "MMMM DD, YYYY")
-            title
-            description
-          }
+          id
+          name
+          date
+          title
         }
       }
     }
