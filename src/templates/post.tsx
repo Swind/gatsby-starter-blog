@@ -329,64 +329,15 @@ const PageTemplate: React.FC<PageTemplateProps> = props => {
 export default PageTemplate;
 
 export const query = graphql`
-  query($slug: String, $primaryTag: String) {
-    logo: file(relativePath: { eq: "img/ghost-logo.png" }) {
-      childImageSharp {
-        fixed {
-          ...GatsbyImageSharpFixed
-        }
-      }
-    }
-    markdownRemark(fields: { slug: { eq: $slug } }) {
-      html
-      htmlAst
-      excerpt
-      timeToRead
-      frontmatter {
+query PostPageQuery {
+  allPost {
+    edges {
+      node {
         title
-        userDate: date(formatString: "D MMMM YYYY")
         date
         tags
-        image {
-          childImageSharp {
-            fluid(maxWidth: 3720) {
-              ...GatsbyImageSharpFluid
-            }
-          }
-        }
-        author {
-          id
-          bio
-          avatar {
-            children {
-              ... on ImageSharp {
-                fixed(quality: 90) {
-                  ...GatsbyImageSharpFixed
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    relatedPosts: allMarkdownRemark(
-      filter: { frontmatter: { tags: { in: [$primaryTag] }, draft: { ne: true } } }
-      limit: 3
-    ) {
-      totalCount
-      edges {
-        node {
-          id
-          timeToRead
-          excerpt
-          frontmatter {
-            title
-          }
-          fields {
-            slug
-          }
-        }
       }
     }
   }
+}
 `;

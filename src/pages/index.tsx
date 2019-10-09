@@ -5,7 +5,6 @@ import Helmet from 'react-helmet';
 
 import Footer from '../components/Footer';
 import SiteNav from '../components/header/SiteNav';
-import PostCard from '../components/PostCard';
 import Wrapper from '../components/Wrapper';
 import IndexLayout from '../layouts';
 import config from '../website-config';
@@ -150,15 +149,6 @@ const IndexPage: React.FC<IndexProps> = props => {
         <main id="site-main" css={[SiteMain, outer]}>
           <div css={inner}>
             <div css={[PostFeed, PostFeedRaise]}>
-              {props.data.allMarkdownRemark.edges.map(post => {
-                // filter out drafts in production
-                return (
-                  (post.node.frontmatter.draft !== true ||
-                    process.env.NODE_ENV !== 'production') && (
-                    <PostCard key={post.node.fields.slug} post={post.node} />
-                  )
-                );
-              })}
             </div>
           </div>
         </main>
@@ -173,7 +163,7 @@ const IndexPage: React.FC<IndexProps> = props => {
 export default IndexPage;
 
 export const pageQuery = graphql`
-  query IndexPageQuery($skip: Int!, $limit: Int!) {
+  query IndexPageQuery {
     logo: file(relativePath: { eq: "img/ghost-logo.png" }) {
       childImageSharp {
         # Specify the image processing specifications right in the query.
@@ -192,10 +182,7 @@ export const pageQuery = graphql`
         }
       }
     }
-    allPost(
-      limit: $limit,
-      skip: $skip
-    ) {
+    allPost{
       edges {
         node {
             title
