@@ -34,6 +34,12 @@ exports.createPages = async ({
   const {
     createPage
   } = actions
+
+  console.log("Create post list page")
+  createPage({
+    path: `/`,
+    component: path.resolve('./src/templates/postList.tsx'),
+  })
 }
 
 exports.onCreateNode = ({
