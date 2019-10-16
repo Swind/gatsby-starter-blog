@@ -35,10 +35,36 @@ exports.createPages = async ({
     createPage
   } = actions
 
-  console.log("Create post list page")
+  // Create index page
+  console.log("Create post index page")
   createPage({
     path: `/`,
     component: path.resolve('./src/templates/postList.tsx'),
+  })
+
+  // Create post pages
+  console.log("Create post page")
+  return graphql(`
+    query PostNameQuery {
+      allPost{
+        edges {
+          node {
+              name
+          }
+        }
+      }
+    }
+  `).then(result => {
+    console.log(result)
+    result.data.allPost.edges.forEach((post)=>{
+      console.log(post.node.name)
+      if(post.node.name){
+        createPage({
+          path: post.node.name,
+          component: path.resolve('./src/templates/post.tsx'),
+        })
+      }
+    }) 
   })
 }
 
