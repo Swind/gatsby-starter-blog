@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import StyleText from '../../styleText'
-import WrapComponent from '../../wrapComponent'
+import StyleText from '../styleText'
+import WrapComponent from '../wrapComponent'
 
 const Caption = styled.figcaption`
   line-height: 1.4;

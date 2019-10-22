@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import api from '../../api'
-import { BlockValue, SignedFileUrls, UnsignedUrl } from '../../../api/types'
+import {getSignedFileUrls} from '../../api/notionClient'
+import { BlockValue, SignedFileUrls, UnsignedUrl } from '../../api/types'
 import FigureBlockContainer from './figureBlockContainer'
 import FigureCaption from './figureCaption'
 
@@ -84,7 +84,7 @@ const getImageUrl = async (url: string, id: string) => {
         table: 'block',
       },
     }
-    const signedFileUrls: SignedFileUrls = await api.getSignedFileUrls([unsignedUrl])
+    const signedFileUrls: SignedFileUrls = await getSignedFileUrls([unsignedUrl])
     if (
       signedFileUrls !== undefined &&
       signedFileUrls.signedUrls !== undefined &&

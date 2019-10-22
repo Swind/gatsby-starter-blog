@@ -3,7 +3,7 @@ import YouTube from 'react-youtube'
 import { BlockValue, SignedFileUrls, UnsignedUrl } from '../../api/types'
 import FigureBlockContainer from './figureBlockContainer'
 import FigureCaption from './figureCaption'
-import api from '../../api'
+import {getSignedFileUrls} from '../../api/notionClient'
 import 'video-react/dist/video-react.css'
 
 interface IProps {
@@ -45,7 +45,7 @@ class VideoBlock extends React.Component<IProps, IState> {
           table: 'block',
         },
       }
-      const signedFileUrls: SignedFileUrls = await api.getSignedFileUrls([unsignedUrl])
+      const signedFileUrls: SignedFileUrls = await getSignedFileUrls([unsignedUrl])
       if (
         signedFileUrls !== undefined &&
         signedFileUrls.signedUrls !== undefined &&

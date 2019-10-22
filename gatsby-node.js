@@ -55,13 +55,14 @@ exports.createPages = async ({
       }
     }
   `).then(result => {
-    console.log(result)
     result.data.allPost.edges.forEach((post)=>{
-      console.log(post.node.name)
       if(post.node.name){
         createPage({
           path: post.node.name,
           component: path.resolve('./src/templates/post.tsx'),
+          context: {
+            postName: post.node.name 
+          }
         })
       }
     }) 

@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { Collection, PageChunk, RecordValue, UnsignedUrl } from './types'
+import { Collection, PageChunk, RecordValue, UnsignedUrl, SignedFileUrls } from './types'
 
 async function post<T>(url: string, data: any): Promise<T> {
     return fetch(`https://www.notion.so/api/v3${url}`,
@@ -52,7 +52,7 @@ export const queryCollection = async (
     return post('/queryCollection', data)
 }
 
-export const getSignedFileUrls = async (data: UnsignedUrl) => {
+export const getSignedFileUrls = async (data: UnsignedUrl[]): Promise<SignedFileUrls> => {
     return post('/getSignedFileUrls', data)
 }
 

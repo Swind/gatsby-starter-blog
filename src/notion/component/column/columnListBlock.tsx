@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { BlockNode } from '../../api/types'
-import { Desktop, Mobile } from '../../responsive'
+import { Desktop, Mobile } from '../responsive'
 import ColumnBlock from './columnBlock'
 
 const DesktopContainer = styled.div`
