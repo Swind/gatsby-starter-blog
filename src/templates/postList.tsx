@@ -1,10 +1,42 @@
 import { graphql } from 'gatsby';
 import * as React from 'react';
-import { css } from '@emotion/core';
-import Helmet from 'react-helmet';
+import styled from '../components/theme'
+import {theme as themeConfig} from '../components/theme'
+import GatsbyLink from 'gatsby-link';
+import moment from 'moment'
+import {ThemeProvider} from 'emotion-theming'
 
-import { Article } from '../notion/api/types';
+const Header = styled.header(({theme})=> ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  [theme.smallMedia]: {
+    flexDirection: 'column-reverse',
+    alignItems: 'flex-start',
+  }
+}))
 
+const H3 = styled.h4(({theme}) => ({
+  marginBottom: theme.spacing
+}))
+
+const Article = styled.article(({theme}) => ({
+  marginBottom: theme.spacing
+}))
+
+const H4 = styled.h4(({theme}) => ({
+  margin: 0
+}))
+
+const Link = styled(GatsbyLink)(({theme}) => ({
+  textDecoration: 'none',
+  color: theme.textColor,
+  transition: 'color 250ms linear',
+  ':hover': {
+    color: theme.accentColor
+  }
+})) 
 
 export interface IndexProps {
   data: {
@@ -24,11 +56,22 @@ export interface IndexProps {
 const IndexPage: React.FC<IndexProps> = props => {
   const posts = props.data.allPost.edges.map((item, index)=>{
     const post = item.node
-    return <div><a href={`/${post.name}`} key={index}>{post.title}</a></div>
+    return (
+      <section>
+        <Article>
+          <Header>
+            <H4>
+              <Link to={`/${post.name}`}>{post.title}</Link>
+            </H4>
+            <time dateTime={moment.unix(post.date).format('MMM DD, YYYY')}></time>
+          </Header>
+        </Article>
+      </section>
+    )
   })
 
   return (
-    <div>{posts}</div>
+    <ThemeProvider theme={themeConfig}>{posts}</ThemeProvider>
   );
 };
 
