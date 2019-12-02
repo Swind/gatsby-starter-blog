@@ -1,10 +1,9 @@
 import { graphql } from 'gatsby';
 import * as React from 'react';
 import styled from '../components/theme'
-import {theme as themeConfig} from '../components/theme'
 import GatsbyLink from 'gatsby-link';
 import moment from 'moment'
-import {ThemeProvider} from 'emotion-theming'
+import Layout from '../components/layout';
 
 const Header = styled.header(({theme})=> ({
   display: 'flex',
@@ -57,7 +56,7 @@ const IndexPage: React.FC<IndexProps> = props => {
   const posts = props.data.allPost.edges.map((item, index)=>{
     const post = item.node
     return (
-      <section>
+      <section key={index}>
         <Article>
           <Header>
             <H4>
@@ -71,7 +70,7 @@ const IndexPage: React.FC<IndexProps> = props => {
   })
 
   return (
-    <ThemeProvider theme={themeConfig}>{posts}</ThemeProvider>
+    <Layout>{posts}</Layout>
   );
 };
 

@@ -1,13 +1,15 @@
 import styled, { CreateStyled } from '@emotion/styled'
-type Theme = {
+export type Theme = {
     spacingPx: number,
-    spacing: number,
+    spacing: string,
     headerHeight: string,
     textColor: string,
     accentColor: string,
     maxWidthPx: number,
     minWidthPx: number
-    smallMedia: number,
+    smallMedia: string,
+    largeMedia: string,
+    centerPadding: Record<string, string | Record<string, string>>
 }
 
 const minWidthPx = 680;
@@ -19,7 +21,7 @@ const largeMedia = `@media(min-width: ${maxWidthPx}px)`;
 const textColor = '#333';
 const accentColor = '#ab4642';
 
-const theme = {
+const theme: Theme = {
   spacingPx,
   spacing: `${spacingPx}px`,
   headerHeight: '75px',
