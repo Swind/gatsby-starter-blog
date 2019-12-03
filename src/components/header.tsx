@@ -48,11 +48,11 @@ const Nav = styled.nav(({ theme }) => ({
 const SiteHeader = () => (
     <Header>
         <H1>
-            <Small>With</Small>
+            <Small>:</Small>
             {' '}
             <A href="/">Swind</A>
             {' '}
-            <Small>comes Ken Responsibility</Small>
+            <Small>ｹﾗｹﾗヽ(ﾟ∀ﾟ)メ(ﾟ∀ﾟ)メ(ﾟ∀ﾟ)ノｹﾗｹﾗ</Small>
         </H1>
         <Nav>
             <Link to="/">Blog</Link>
