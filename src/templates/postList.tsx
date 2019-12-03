@@ -4,6 +4,7 @@ import styled from '../components/theme'
 import GatsbyLink from 'gatsby-link';
 import moment from 'moment'
 import Layout from '../components/layout';
+import CenterWrap from '../components/center-wrap'
 
 const Header = styled.header(({theme})=> ({
   display: 'flex',
@@ -70,7 +71,12 @@ const IndexPage: React.FC<IndexProps> = props => {
   })
 
   return (
-    <Layout>{posts}</Layout>
+    <Layout>
+      <CenterWrap>
+        <h2>Blog</h2>
+        {posts}
+      </CenterWrap>
+    </Layout>
   );
 };
 
