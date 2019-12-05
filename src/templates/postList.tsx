@@ -5,6 +5,7 @@ import GatsbyLink from 'gatsby-link';
 import moment from 'moment'
 import Layout from '../components/layout';
 import CenterWrap from '../components/center-wrap'
+import TagList from '../components/tag-list'
 
 const Header = styled.header(({theme})=> ({
   display: 'flex',
@@ -63,8 +64,11 @@ const IndexPage: React.FC<IndexProps> = props => {
             <H4>
               <Link to={`/${post.name}`}>{post.title}</Link>
             </H4>
-            <time dateTime={moment.unix(post.date).format('MMM DD, YYYY')}></time>
+            <time dateTime={moment.unix(post.date).format(moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>{moment.unix(post.date).format('MMM DD, YYYY')}</time>
           </Header>
+          <footer>
+            <TagList tags={post.tags}></TagList>
+          </footer>
         </Article>
       </section>
     )
@@ -84,7 +88,9 @@ export default IndexPage;
 
 export const pageQuery = graphql`
   query IndexPageQuery {
-    allPost{
+    allPost(
+      sort:{fields: date order:DESC}
+    ){
       edges {
         node {
             title
