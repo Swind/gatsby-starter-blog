@@ -6,6 +6,7 @@ import moment from 'moment'
 import Layout from '../components/layout';
 import CenterWrap from '../components/center-wrap'
 import TagList from '../components/tag-list'
+import { number } from 'prop-types';
 
 const Header = styled.header(({theme})=> ({
   display: 'flex',
@@ -18,7 +19,7 @@ const Header = styled.header(({theme})=> ({
   }
 }))
 
-const H3 = styled.h4(({theme}) => ({
+const H3 = styled.h2(({theme}) => ({
   marginBottom: theme.spacing
 }))
 
@@ -54,22 +55,58 @@ export interface IndexProps {
   };
 }
 
+interface Post {
+  title: string,
+  date: number,
+  tags: string[],
+  name: string
+}
+
+function renderPost(post: Post) {
+  return (
+    <Article>
+      <Header>
+        <H4>
+          <Link to={`/${post.name}`}>{post.title}</Link>
+        </H4>
+        <time dateTime={moment.unix(post.date).format(moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>{moment.unix(post.date).format('MMM DD, YYYY')}</time>
+      </Header>
+      <footer>
+        <TagList tags={post.tags}></TagList>
+      </footer>
+    </Article>
+  )
+}
+
 const IndexPage: React.FC<IndexProps> = props => {
-  const posts = props.data.allPost.edges.map((item, index)=>{
+  // Group posts by year
+  const nodes = props.data.allPost.edges
+  const allPost: Record<string, Post[]>  = {}
+
+  nodes.forEach((item) => {
     const post = item.node
+    const year = moment.unix(post.date).year()
+    if(!(year in allPost)){
+      allPost[year] = []
+    }
+    allPost[year].push(post)
+  })
+
+  const years = Object.keys(allPost).sort().reverse()
+
+  const allPostElements = years.map((year)=>{
+    const posts = allPost[year].map((post, index)=>{
+      return (
+        <section key={index}>
+          {renderPost(post)}
+        </section>
+      )
+    })
+
     return (
-      <section key={index}>
-        <Article>
-          <Header>
-            <H4>
-              <Link to={`/${post.name}`}>{post.title}</Link>
-            </H4>
-            <time dateTime={moment.unix(post.date).format(moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}>{moment.unix(post.date).format('MMM DD, YYYY')}</time>
-          </Header>
-          <footer>
-            <TagList tags={post.tags}></TagList>
-          </footer>
-        </Article>
+      <section key={year}>
+        <H3>{year}</H3>
+        {posts}
       </section>
     )
   })
@@ -77,8 +114,7 @@ const IndexPage: React.FC<IndexProps> = props => {
   return (
     <Layout>
       <CenterWrap>
-        <h2>Blog</h2>
-        {posts}
+        {allPostElements}
       </CenterWrap>
     </Layout>
   );
