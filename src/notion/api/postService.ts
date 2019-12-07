@@ -183,10 +183,6 @@ async function SyncPosts(
     createNodeId: CreateNodeId,
     createContentDigest: CreateContentDigest) {
 
-    console.log(createNode)
-    console.log(createNodeId)
-    console.log(createContentDigest)
-
     log.info(`Saving latest post list ...`)
     const posts = await UpdateAndLoadPostFiles()
 
